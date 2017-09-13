@@ -82,6 +82,7 @@ class CandidateDistributions:
         """Empty the list of candidate distributions."""
 
         self.dists = list()
+
         
     def remove_dist(self, dist_index):
         """Remove candidate distribution by its index in self.dists."""
@@ -95,6 +96,8 @@ class SupportedDistributions():
     Register, instantiate, and define methods for supported distributions.
     """
 
+    # SupportedDistributions is a parent class, is never used on data
+
     subclasses = {}  # Empty container for distributions to be registered at
 
     
@@ -102,6 +105,7 @@ class SupportedDistributions():
         """Preserve tag/label of distribution as attribute self.label"""
 
         self.label = label
+        self.loc = 0.0    # Default
 
 
     # Decorator to store distrib. subclass and its label to self.sublasses
@@ -128,24 +132,38 @@ class SupportedDistributions():
             raise ValueError("Invalid distribution: %s" %dist_str)
         return cls.subclasses[dist_str](dist_str).loc_optional  
 
+
     def feed_samples(self, samples):
+        """Store samples and num. of samples in the object as attributes."""
+
         self.samples = np.sort(samples)
         self.nsamples = np.size(samples)
 
+
     def get_label(self):
+        """Get the label associated with this distribution"""
+
         return self.label
 
+
     def set_location(self, loc):
+        """Store the location parameter value as an attribute."""
+
         if self.has_loc:
             self.loc = loc
 
+
     def get_scale_str(self):
+        """Return the scale parameter value as a string, if applicable."""
+
         if self.has_scale:
             return str(self.scale)
         else:
             return "NA"
+
     
     def get_loc_str(self):
+        """Return the location parameter value as a string, if applicable."""
         if self.has_loc:
             return str(self.loc)
         else:
@@ -153,33 +171,48 @@ class SupportedDistributions():
         
 
     def get_shape_str(self):
-        """Return shape parameter value as a string if dist has a shape param."""
+        """Return shape parameter value as a string, if applicable."""
  
         if self.has_shape:
             return str(self.shape)
         else:
             return "NA"
 
+
     def calc_results(self, samples, qmethod_str):
+        """Calculate the distr. parameters based on samples and quantile method."""
+
         self.feed_samples(samples)
         self.calc_quantiles(qmethod_str)
         self.set_location(loc)
         self.eval_data()
+
         
     def get_coeff_of_determ_str(self):
+        """Return the coefficient of determination of prob. plot as a string."""
+
         return str(self.r2)
 
+
     def eval_data(self):
+        """Perform the prob. plotting calcs; determine distr. parameter values."""
+
         self._pplot_transform_data()
         self._linear_regression()
         self.extract_pplot_regress_quantities()
 
+
     def _linear_regression(self):
+        """Perform a linear regression on the transformed samples/quantiles."""
+
         self.slope, self.intercept, r_value, pvalue, stderr = \
             stats.linregress(self.x, self.y)
         self.r2 = r_value**2.0
 
+
     def create_pplot(self, axes):
+        """Draw probabaility plot of data on 'axes'"""
+
         liny = lambda x: self.slope * x + self.intercept
         xmin, xmax = np.min(self.x), np.max(self.x)
         ymin, ymax = liny(xmin), liny(xmax)
@@ -203,14 +236,24 @@ class SupportedDistributions():
         axes.grid(which='major')
         
 
-    def calc_quantiles(self, method):
+    def calc_quantiles(self, qmethod):
+        """Calculate the values of the quantiles according to 'qmethod'"""
+
         n = self.nsamples
         self.quantiles = \
-            Quantiles.create_subclass_instance(method)().get_quantiles(n)
+            Quantiles.create_subclass_instance(qmethod)().get_quantiles(n)
+
 
 @SupportedDistributions.register_distribution("Normal")    
 class Normal(SupportedDistributions):
-    pdf_eq = "$f_{X}(x) = \frac{1}{\sqrt{2\pi\sigma}}e^{-\frac{\left(x-\mu\right)^2}{2\sigma^2}}$"
+    """Normal/Gaussian Probability plotting object"""
+
+#   Information on probability plotting with normal distribution:
+#   [a] NIST  - http://www.itl.nist.gov/div898/handbook/eda/section3/normprpl.htm
+#   [b] SciPy - https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.norm.html
+#   [c] Wolfram Mathworld - http://mathworld.wolfram.com/NormalDistribution.html
+    
+    pdf_eq = r"$f_{X}(x) = \frac{1}{\sqrt{2\pi\sigma}}e^{-\frac{\left(x-\mu\right)^2}{2\sigma^2}}$"
     scipy_name = "norm"
     has_shape = False
     has_loc = True
@@ -218,25 +261,32 @@ class Normal(SupportedDistributions):
     loc_optional = False
     xlabel = r"$erf^{-1}\left[2F_X(x)-1\right]$"
     ylabel = r"$x$"
+
         
     def _pplot_transform_data(self):
+        """Transform samples/quantiles based on prob. plotting of normal distr."""
+
         self.x = erfinv((2.0 * self.quantiles) - 1.0)
         self.y = self.samples
 
+
     def extract_pplot_regress_quantities(self):
+        """Calculate scale and location values from prob. plot slope/intercept."""
+
         self.scale = self.slope   # stdev
         self.loc = self.intercept # mean
-        
-    def _make_dist_obj(self):
-        self.dist_obj = stats.norm(loc=self.loc,
-                                   scale=self.scale)
-        
-    def clear(self):
-        self.scale = None
-        self.loc = None
+    
     
 @SupportedDistributions.register_distribution("Lognormal")    
 class Lognormal(SupportedDistributions):
+    """Lognormal distribution probability plotting object"""
+
+#   Information on probability plotting with lognormal distribution:
+#   [a] NIST  - http://www.itl.nist.gov/div898/handbook/apr/section2/apr221.htm
+#   [b] NIST  - http://www.itl.nist.gov/div898/handbook/apr/section1/apr164.htm#Formula's
+#   [c] Wolfram Mathworld - http://mathworld.wolfram.com/LogNormalDistribution.html
+#   [d] SciPy - https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.lognorm.html
+ 
     scipy_name = "lognorm"
     has_shape = True
     has_loc = True  # can be specified, default 0
@@ -245,24 +295,31 @@ class Lognormal(SupportedDistributions):
     xlabel = r"$erf^{-1}\left[F_X(x)\right]$"
     ylabel = r"$\ln(x)$"
     
+
     def _pplot_transform_data(self):
+        """Transf. samples/quantiles based on prob. plotting of lognormal distr."""
+
         self.x = erfinv(self.quantiles)
         self.y = np.log(self.samples - self.loc)
 
+
     def extract_pplot_regress_quantities(self):
+        """Calculate scale and shape values from prob. plot slope/intercept."""
+
         self.shape = self.slope * np.log(10)
         self.scale = self.intercept # mean
 
-    def _make_dist_obj(self):
-        self.dist_obj = stats.lognorm(self.shape,
-                                      loc=self.loc,
-                                      scale=self.scale) 
-    def clear(self):
-        self.scale = None
-        self.shape = None
 
 @SupportedDistributions.register_distribution("Exponential") 
 class Exponential(SupportedDistributions):
+    """Exponential distribution probability plotting object"""
+
+#   Information on probability plotting with exponential distribution:
+#   [a] NIST  - http://www.itl.nist.gov/div898/handbook/apr/section2/apr221.htm
+#   [b] NIST  - http://www.itl.nist.gov/div898/handbook/eda/section3/eda3667.htm
+#   [c] Wolfram Mathworld - http://mathworld.wolfram.com/ExponentialDistribution.html
+#   [d] SciPy - https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.expon.html
+ 
     scipy_name = "expon"
     has_scale = True
     has_loc = True # can be specified, default 0
@@ -270,22 +327,32 @@ class Exponential(SupportedDistributions):
     loc_optional = True
     xlabel = r"$x$"
     ylabel = r"$\ln\left(\frac{1}{1-F_X(x)}\right)$"
-    
+ 
+
     def _pplot_transform_data(self):
+        """Transf. samples/quantiles based on prob. plotting of exponential distr."""
+
         self.x = self.samples - self.loc
         self.y = np.log(1.0 / (1.0 - self.quantiles))
 
+
     def extract_pplot_regress_quantities(self):
+        """Calculate scale value from prob. plot slope/intercept."""
+
         self.scale = 1.0 / self.slope
         
-    def _make_dist_obj(self):
-        self.dist_obj = stats.expon(loc=self.loc,
-                                    scale=self.scale) 
-    def clear(self):
-        self.scale = None
+
         
 @SupportedDistributions.register_distribution("Weibull") 
 class Weibull(SupportedDistributions):
+    """Weibull distribution probability plotting object"""
+
+#   Information on probability plotting with Weibull distribution:
+#   [a] NIST  - http://www.itl.nist.gov/div898/handbook/apr/section2/apr221.htm
+#   [b] NIST  - http://www.itl.nist.gov/div898/handbook/apr/section1/apr162.htm#Formula'sand
+#   [c] Wolfram Mathworld - http://mathworld.wolfram.com/WeibullDistribution.html
+#   [d] SciPy - https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.frechet_r.html
+ 
     scipy_name = "frechet_r"
     has_scale = True
     has_shape = True 
@@ -295,24 +362,29 @@ class Weibull(SupportedDistributions):
     ylabel = r"$\ln\left[\ln\left(\frac{1}{1-F_X(x)}\right)\right]$"
         
     def _pplot_transform_data(self):
+        """Transf. samples/quantiles based on prob. plotting of Weibull distr."""
+
         self.x = np.log(self.samples - self.loc)
         self.y = np.log(np.log(1.0 / (1.0 - self.quantiles)))
 
+
     def extract_pplot_regress_quantities(self):
+        """Calculate scale and shape values from prob. plot slope/intercept."""
+
         self.shape = self.slope
         self.scale = np.exp(-1.0 * self.intercept/ self.slope)
 
-    def _make_dist_obj(self):
-        self.dist_obj = stats.frechet_r(self.shape,
-                                        loc=self.loc,
-                                        scale=self.scale) 
-
-    def clear(self):
-        self.scale = None
-        self.shape = None
         
 @SupportedDistributions.register_distribution("Extreme Value, Type I")
 class ExtremeValueTypeI(SupportedDistributions):
+    """Extreme Value, Type I (EV-I) probability plotting object"""
+
+#   Information on probability plotting with EV-I distribution:
+#   [a] NIST  - http://www.itl.nist.gov/div898/handbook/apr/section2/apr221.htm
+#   [b] NIST  - http://www.itl.nist.gov/div898/handbook/eda/section3/eda366g.htm
+#   [c] Wolfram Mathworld - http://mathworld.wolfram.com/ExtremeValueDistribution.html
+#   [d] SciPy - https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.gumbel_l.html
+ 
     scipy_name = "gumbel_l"
     has_shape = False
     has_loc = True
@@ -322,23 +394,27 @@ class ExtremeValueTypeI(SupportedDistributions):
     ylabel = r"$\ln\left[-\ln\left(1-F_X(x)\right)\right]$"
 
     def _pplot_transform_data(self):
+        """Transf. samples/quantiles based on prob. plotting of EV-I distr."""
+
         self.x = self.samples
         self.y = np.log(-1.0 * np.log(1.0 - self.quantiles))
 
+
     def extract_pplot_regress_quantities(self):      
+        """Calculate scale and shape values from prob. plot slope/intercept."""
+
         self.scale = 1.0 / self.slope
         self.loc = 1.0 * self.intercept * self.slope
-        
-    def _make_dist_obj(self):
-        self.dist_obj = stats.gumbel_l(loc=self.loc,
-                                       scale=self.scale) 
 
-    def clear(self):
-        self.scale = None
-        self.loc = None
 
 @SupportedDistributions.register_distribution("Logistic")
 class Logistic(SupportedDistributions):
+    """Logistic probability plotting object"""
+
+#   Information on probability plotting with Logistic distribution:
+#   [a] SciPy  - https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.logistic.html
+#   [b] Wolfram Mathworld - http://mathworld.wolfram.com/LogisticDistribution.html
+ 
     name = "Logistic"
     scipy_name = "logistic"
     has_shape = False
@@ -348,20 +424,30 @@ class Logistic(SupportedDistributions):
     xlabel = r"$\tanh^{-1}\left(2*F_X{x}-1\right)$"
     ylabel = r"$x$"
 
+
     def _pplot_transform_data(self):
+        """Transf. samples/quantiles based on prob. plotting of Logistic distr."""
+
         self.x = np.arctanh(2.0*self.quantiles - 1)
         self.y = self.samples
 
+
     def extract_pplot_regress_quantities(self):      
+        """Calculate scale and location values from prob. plot slope/intercept."""
+
         self.scale = 0.5 * self.slope
         self.loc = self.intercept
 
-    def clear(self):
-        self.scale = None
-        self.loc = None
         
 @SupportedDistributions.register_distribution("Uniform")
 class Uniform(SupportedDistributions):
+    """Uniform probability plotting object"""
+
+#   Information on probability plotting with Uniform distribution:
+#   [a] NIST  - http://www.itl.nist.gov/div898/handbook/eda/section3/eda3662.htm
+#   [c] Wolfram Mathworld - http://mathworld.wolfram.com/UniformDistribution.html
+#   [d] SciPy - https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.uniform.html
+ 
     scipy_name = "uniform"
     has_shape = False
     has_loc = True
@@ -370,15 +456,18 @@ class Uniform(SupportedDistributions):
     xlabel = r"$F_X{x}$"
     ylabel = r"$x$"
 
+
     def _pplot_transform_data(self):
+        """Transf. samples/quantiles based on prob. plotting of Uniform distr."""
+
         self.x = self.quantiles
         self.y = self.samples
 
+
     def extract_pplot_regress_quantities(self):      
+        """Calculate scale and locations values from prob. plot slope/intercept."""
+
         self.scale = self.slope
         self.loc = self.intercept        
 
-    def clear(self):
-        self.scale = None
-        self.loc = None
 
