@@ -84,24 +84,27 @@ class CandidateDistributions:
         self.dists = list()
         
     def remove_dist(self, dist_index):
+        """Remove candidate distribution by its index in self.dists."""
         
         self.dists.pop(dist_index)
 
-    def store_data(self, samples):
-        for dist in self.dists:
-            dist.feed_samples(samples)
-
-    def clear_results(self):
-        for dist in self.dists:
-            dist.clear()
 
 
 class SupportedDistributions():
-    subclasses = {}
+    """
+    Register, instantiate, and define methods for supported distributions.
+    """
+
+    subclasses = {}  # Empty container for distributions to be registered at
+
     
     def __init__(self, label):
+        """Preserve tag/label of distribution as attribute self.label"""
+
         self.label = label
-    
+
+
+    # Decorator to store distrib. subclass and its label to self.sublasses
     @classmethod
     def register_distribution(cls, dist_str):
         def decorator(subclass):
@@ -109,12 +112,16 @@ class SupportedDistributions():
             return subclass
         return decorator
     
+
+    # Decorator to instantiate a distribution object from its label.
     @classmethod
     def create_subclass_instance(cls, dist_str):
         if dist_str not in cls.subclasses:
             raise ValueError("Invalid distribution: %s" %dist_str)
         return cls.subclasses[dist_str](dist_str)
 
+
+    # Decorator to return the value of the location parameter, if it exists
     @classmethod
     def has_optional_loc_param(cls, dist_str):
         if dist_str not in cls.subclasses:
@@ -124,7 +131,10 @@ class SupportedDistributions():
         else:
             return "NA"
         
+
     def get_shape_str(self):
+        """Return shape parameter value as a string if dist has a shape param."""
+ 
         if self.has_shape:
             return str(self.shape)
         else:
@@ -352,24 +362,3 @@ class Uniform(SupportedDistributions):
         self.scale = None
         self.loc = None
 
-        
-###############################################################################
-#
-#    pplotpy - a probability plotting tool for Python
-#
-#    Copyright (C) 2017,  Nicholas A. Reynolds
-#
-#    License Summary:
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version.
-#
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
-#
-#    You should have received a copy of the GNU General Public License
-#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#

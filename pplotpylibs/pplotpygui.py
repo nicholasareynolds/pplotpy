@@ -1,25 +1,26 @@
-"""
-    pplotpy - a probability plotting tool for Python
-
-    Copyright (C) 2017,  Nicholas A. Reynolds
-
-    License Summary:
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-    Full License Available in LICENSE file at
-    https://github.com/nicholasareynolds/pplotpy
-"""
+################################################################################
+#
+#    pplotpy - a probability plotting tool for Python
+#    Copyright (C) 2017,  Nicholas A. Reynolds
+#
+#    License Summary:
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+#    Full License Available in LICENSE file at
+#    https://github.com/nicholasareynolds/pplotpy
+#
+################################################################################
 
 from PyQt5 import QtCore, QtWidgets
 from numpy import loadtxt
@@ -33,6 +34,7 @@ from distributions import SupportedDistributions, CandidateDistributions
 from quantiles import Quantiles
 
 class MainWindow(QtWidgets.QMainWindow):
+    """Main window of pplotpy; no parent higher than this object"""
     
     def __init__(self):
         super().__init__()
@@ -53,6 +55,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.initUI()
         
     def initUI(self):
+        """Set up user interface"""
+
         self.setWindowTitle("pplotpy")
         self.resize(566, 520)
         self.verticalLayoutWidget = QtWidgets.QWidget(self)
