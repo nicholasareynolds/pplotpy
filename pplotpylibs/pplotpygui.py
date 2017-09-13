@@ -41,7 +41,6 @@ class MainWindow(QtWidgets.QMainWindow):
         
         # Initialize
         self.samples = None
-        self.main_widget = QtWidgets.QWidget(self)
         self.cDists = CandidateDistributions()
         self.aDists = SupportedDistributions.subclasses.keys()
         self.quantile_choices = Quantiles.subclasses.keys()
@@ -57,172 +56,193 @@ class MainWindow(QtWidgets.QMainWindow):
     def initUI(self):
         """Set up user interface"""
 
+        # Main Window Area
         self.setWindowTitle("pplotpy")
         self.resize(566, 520)
-        self.verticalLayoutWidget = QtWidgets.QWidget(self)
-        self.verticalLayoutWidget.setGeometry(QtCore.QRect(10, 10, 541, 461))
-        self.verticalLayoutWidget.setObjectName("verticalLayoutWidget")
-        self.verticalLayout = QtWidgets.QVBoxLayout(self.verticalLayoutWidget)
-        self.verticalLayout.setContentsMargins(0, 0, 0, 0)
-        self.verticalLayout.setObjectName("verticalLayout")
-        self.horizontalLayout = QtWidgets.QHBoxLayout()
-        self.horizontalLayout.setObjectName("horizontalLayout")
-        self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
-        self.horizontalLayout_2.setObjectName("horizontalLayout_2")
-        
-        self.dataFileButton = QtWidgets.QPushButton(self.verticalLayoutWidget)
-        self.dataFileButton.setObjectName("dataFileButton")
+        self.main_widget = QtWidgets.QWidget(self)
+        self.main_widget.setGeometry(QtCore.QRect(10, 10, 541, 461))
+
+        # --- Declare Widgets ---
+
+        # Data Button (Open File Dialog)
+        self.dataFileButton = QtWidgets.QPushButton(self.main_widget)
         self.dataFileButton.setText("Data File")
-        
-        self.horizontalLayout_2.addWidget(self.dataFileButton)
-        self.verticalLayout_3 = QtWidgets.QVBoxLayout()
-        self.verticalLayout_3.setObjectName("verticalLayout_3")
-        spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.verticalLayout_3.addItem(spacerItem)
-        self.dataFilePath = QtWidgets.QLineEdit(self.verticalLayoutWidget)
+        # action
+        self.dataFileButton.clicked.connect(self.upload_samples)
+
+        # File Path (Path to Data Sample File)
+        self.dataFilePath = QtWidgets.QLineEdit(self.main_widget)
         self.dataFilePath.setEnabled(False)
-        self.dataFilePath.setObjectName("dataFilePath")
-        self.verticalLayout_3.addWidget(self.dataFilePath)
-        spacerItem1 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.verticalLayout_3.addItem(spacerItem1)
-        self.horizontalLayout_2.addLayout(self.verticalLayout_3)
-        self.horizontalLayout.addLayout(self.horizontalLayout_2)
-        self.line_2 = QtWidgets.QFrame(self.verticalLayoutWidget)
-        self.line_2.setFrameShape(QtWidgets.QFrame.VLine)
-        self.line_2.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line_2.setObjectName("line_2")
-        self.horizontalLayout.addWidget(self.line_2)
-        self.verticalLayout_2 = QtWidgets.QVBoxLayout()
-        self.verticalLayout_2.setObjectName("verticalLayout_2")
-        spacerItem2 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.verticalLayout_2.addItem(spacerItem2)
-        self.quantileLabel = QtWidgets.QLabel(self.verticalLayoutWidget)
-        self.quantileLabel.setObjectName("quantileLabel")
+
+
+        # Quantiles (Combo Box)
+        self.quantileLabel = QtWidgets.QLabel(self.main_widget)
         self.quantileLabel.setText("Quantile Method:")
-        self.verticalLayout_2.addWidget(self.quantileLabel, 0, QtCore.Qt.AlignHCenter)
-        self.quantileComboBox = QtWidgets.QComboBox(self.verticalLayoutWidget)
-        self.quantileComboBox.setObjectName("quantileComboBox")
+        self.quantileComboBox = QtWidgets.QComboBox(self.main_widget)
         self.quantileComboBox.addItems(self.quantile_choices)
-        self.verticalLayout_2.addWidget(self.quantileComboBox, 0, QtCore.Qt.AlignTop)
-        spacerItem3 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.verticalLayout_2.addItem(spacerItem3)
-        self.horizontalLayout.addLayout(self.verticalLayout_2)
-        self.verticalLayout.addLayout(self.horizontalLayout)
-        self.line_4 = QtWidgets.QFrame(self.verticalLayoutWidget)
-        self.line_4.setFrameShape(QtWidgets.QFrame.HLine)
-        self.line_4.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line_4.setObjectName("line_4")
-        self.verticalLayout.addWidget(self.line_4)
-        self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
-        self.horizontalLayout_3.setObjectName("horizontalLayout_3")
-        self.verticalLayout_4 = QtWidgets.QVBoxLayout()
-        self.verticalLayout_4.setObjectName("verticalLayout_4")
-        
-        # Available Distributions
-        self.availDistsLabel = QtWidgets.QLabel(self.verticalLayoutWidget)
-        self.availDistsLabel.setObjectName("availDistsLabel")
+        # action
+        self.quantileComboBox.activated.connect(self.update_query_method) 
+
+        # Available Distributions (List Box)
+        self.availDistsLabel = QtWidgets.QLabel(self.main_widget)
         self.availDistsLabel.setText("Available Distributions:")
-        self.verticalLayout_4.addWidget(self.availDistsLabel)
-        self.availDistsListWidget = QtWidgets.QListWidget(self.verticalLayoutWidget)
+        self.availDistsListWidget = QtWidgets.QListWidget(self.main_widget)
         self.availDistsListWidget.setEnabled(False)
-        self.availDistsListWidget.setObjectName("availDistsListWidget")
         self.availDistsListWidget.addItems(self.aDists)
         self.availDistsListWidget.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self.availDistsListWidget.setCurrentRow(0)
-        self.verticalLayout_4.addWidget(self.availDistsListWidget)
-        self.horizontalLayout_3.addLayout(self.verticalLayout_4)
+        # actions
+        self.availDistsListWidget.itemClicked.connect(self.unlock_location)
+        self.availDistsListWidget.itemDoubleClicked.connect(self.add_dist_by_dclick)
 
-        # Location Parameter
-        self.locLabel = QtWidgets.QLabel(self.verticalLayoutWidget)
+        # Location Parameter (optional user-specified)
+        self.locLabel = QtWidgets.QLabel(self.main_widget)
         self.locLabel.setEnabled(False)
-        self.locLabel.setObjectName("locLabel")
         self.locLabel.setText("Location:")
-        self.horizontalLayout_3.addWidget(self.locLabel)
-        self.locTextBox = QtWidgets.QLineEdit(self.verticalLayoutWidget)
+        self.locTextBox = QtWidgets.QLineEdit(self.main_widget)
         self.locTextBox.setEnabled(False)
         self.locTextBox.setMaximumSize(QtCore.QSize(50, 16777215))
         self.locTextBox.setText("")
-        self.locTextBox.setObjectName("locTextBox")
-        self.horizontalLayout_3.addWidget(self.locTextBox)
-        
-        spacerItem4 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_3.addItem(spacerItem4)
-        self.line = QtWidgets.QFrame(self.verticalLayoutWidget)
-        self.line.setFrameShape(QtWidgets.QFrame.VLine)
-        self.line.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line.setObjectName("line")
-        self.horizontalLayout_3.addWidget(self.line)
-        self.verticalLayout_5 = QtWidgets.QVBoxLayout()
-        self.verticalLayout_5.setObjectName("verticalLayout_5")
-        
-        # Remove All (distributions)
-        self.removeAllButton = QtWidgets.QPushButton(self.verticalLayoutWidget)
-        self.removeAllButton.setObjectName("removeAllButton")
-        self.removeAllButton.setText("Remove All")
-        self.verticalLayout_5.addWidget(self.removeAllButton)
 
-        # Remove (distribution)
-        self.removeButton = QtWidgets.QPushButton(self.verticalLayoutWidget)
-        self.removeButton.setObjectName("removeButton")
+        # Remove All (Button)
+        self.removeAllButton = QtWidgets.QPushButton(self.main_widget)
+        self.removeAllButton.setText("Remove All")
+        # action
+        self.removeAllButton.clicked.connect(self.rm_all_distributions)
+
+        # Remove (Button)
+        self.removeButton = QtWidgets.QPushButton(self.main_widget)
         self.removeButton.setText("Remove")
         self.removeButton.setDisabled(True)
-        self.verticalLayout_5.addWidget(self.removeButton)
+        # action
+        self.removeButton.clicked.connect(self.rm_distribution)
 
-        # Add (distribution)
-        self.addButton = QtWidgets.QPushButton(self.verticalLayoutWidget)
-        self.addButton.setObjectName("addButton")
+        # Add (Button)
+        self.addButton = QtWidgets.QPushButton(self.main_widget)
         self.addButton.setText("Add")
         self.addButton.setDisabled(True)
-        self.verticalLayout_5.addWidget(self.addButton)
-        
-        self.horizontalLayout_3.addLayout(self.verticalLayout_5)
-        self.verticalLayout.addLayout(self.horizontalLayout_3)
-        self.line_3 = QtWidgets.QFrame(self.verticalLayoutWidget)
-        self.line_3.setFrameShape(QtWidgets.QFrame.HLine)
-        self.line_3.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line_3.setObjectName("line_3")
-        self.verticalLayout.addWidget(self.line_3)
-        
-        # Candidate Distribution Table
-        self.candDistsLabel = QtWidgets.QLabel(self.verticalLayoutWidget)
-        self.candDistsLabel.setObjectName("candDistsLabel")
+        # action
+        self.addButton.clicked.connect(self.add_dist_by_button)
+
+        # Candidate Distributions (Table)
+        self.candDistsLabel = QtWidgets.QLabel(self.main_widget)
         self.candDistsLabel.setText("Candidate Distributions:")
-        self.verticalLayout.addWidget(self.candDistsLabel)
-        self.candListsTableWidget = QtWidgets.QTableWidget(self.verticalLayoutWidget)
-        self.candListsTableWidget.setObjectName("candListsTableWidget")
+        self.candListsTableWidget = QtWidgets.QTableWidget(self.main_widget)
         self.candListsTableWidget.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         self.candListsTableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self.candListsTableWidget.setColumnCount(5)
         self.candListsTableWidget.setRowCount(0)
         self.candListsTableWidget.setHorizontalHeaderLabels(self.table_headers)
         self.candListsTableWidget.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
-        self.verticalLayout.addWidget(self.candListsTableWidget)
-        self.line_5 = QtWidgets.QFrame(self.verticalLayoutWidget)
+        # action
+        self.candListsTableWidget.itemDoubleClicked.connect(self.create_probability_plot)
+
+        # Print SciPy (button)
+        self.printScipyButton = QtWidgets.QPushButton(self.main_widget)
+        self.printScipyButton.setText("Print SciPy")
+
+        # Print Distribution (button)
+        self.printDistButton = QtWidgets.QPushButton(self.main_widget)
+        self.printDistButton.setText("Print Distribution")
+
+        # Lines 
+        #   (between Data File and Quantile Combo Box) 
+        self.line_2 = QtWidgets.QFrame(self.main_widget)
+        self.line_2.setFrameShape(QtWidgets.QFrame.VLine)
+        self.line_2.setFrameShadow(QtWidgets.QFrame.Sunken)
+        #   (between 1st (file/quantile) & 2nd (supported distributions)
+        self.line_4 = QtWidgets.QFrame(self.main_widget)
+        self.line_4.setFrameShape(QtWidgets.QFrame.HLine)
+        self.line_4.setFrameShadow(QtWidgets.QFrame.Sunken)
+
+        self.line = QtWidgets.QFrame(self.main_widget)
+        self.line.setFrameShape(QtWidgets.QFrame.VLine)
+        self.line.setFrameShadow(QtWidgets.QFrame.Sunken)
+
+        self.line_3 = QtWidgets.QFrame(self.main_widget)
+        self.line_3.setFrameShape(QtWidgets.QFrame.HLine)
+        self.line_3.setFrameShadow(QtWidgets.QFrame.Sunken)
+
+        self.line_5 = QtWidgets.QFrame(self.main_widget)
         self.line_5.setFrameShape(QtWidgets.QFrame.HLine)
         self.line_5.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line_5.setObjectName("line_5")
-        self.verticalLayout.addWidget(self.line_5)
-        self.horizontalLayout_4 = QtWidgets.QHBoxLayout()
-        self.horizontalLayout_4.setObjectName("horizontalLayout_4")
+
+        # Spacer Items
+        spacerItem  = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        spacerItem1 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        spacerItem2 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        spacerItem3 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        spacerItem4 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         spacerItem5 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_4.addItem(spacerItem5)
-
-        # Print SciPy information button
-        self.printScipyButton = QtWidgets.QPushButton(self.verticalLayoutWidget)
-        self.printScipyButton.setObjectName("printScipyButton")
-        self.printScipyButton.setText("Print SciPy")
-        self.horizontalLayout_4.addWidget(self.printScipyButton)
-
-        # Print Distribution information button
-        self.printDistButton = QtWidgets.QPushButton(self.verticalLayoutWidget)
-        self.printDistButton.setObjectName("printDistButton")
-        self.printDistButton.setText("Print Distribution")
-        self.horizontalLayout_4.addWidget(self.printDistButton)
-
         spacerItem6 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+
+
+        # --- Organize Widgets via Layout Boxes (independent/small to large containers) ---
+
+        # Add/Remove Distribution buttons
+        self.verticalLayout_5 = QtWidgets.QVBoxLayout()
+        self.verticalLayout_5.addWidget(self.removeAllButton)
+        self.verticalLayout_5.addWidget(self.removeButton)
+        self.verticalLayout_5.addWidget(self.addButton)
+ 
+        # Available Distributions
+        self.verticalLayout_4 = QtWidgets.QVBoxLayout()
+        self.verticalLayout_4.addWidget(self.availDistsLabel)
+        self.verticalLayout_4.addWidget(self.availDistsListWidget)
+
+        # Data File Path
+        self.verticalLayout_3 = QtWidgets.QVBoxLayout()
+        self.verticalLayout_3.addItem(spacerItem)
+        self.verticalLayout_3.addWidget(self.dataFilePath)
+        self.verticalLayout_3.addItem(spacerItem1)
+
+        # Data File
+        self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_2.addWidget(self.dataFileButton)
+        self.horizontalLayout_2.addLayout(self.verticalLayout_3)
+
+        # Quantile Box
+        self.verticalLayout_2 = QtWidgets.QVBoxLayout()
+        self.verticalLayout_2.addItem(spacerItem2)
+        self.verticalLayout_2.addWidget(self.quantileLabel, 0, QtCore.Qt.AlignHCenter)
+        self.verticalLayout_2.addWidget(self.quantileComboBox, 0, QtCore.Qt.AlignTop)
+        self.verticalLayout_2.addItem(spacerItem3)
+
+        # Top Row of Widgets
+        self.horizontalLayout = QtWidgets.QHBoxLayout()
+        self.horizontalLayout.addLayout(self.horizontalLayout_2)
+        self.horizontalLayout.addWidget(self.line_2)
+        self.horizontalLayout.addLayout(self.verticalLayout_2)
+
+        # Center Row of Widgets
+        self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_3.addLayout(self.verticalLayout_4)
+        self.horizontalLayout_3.addWidget(self.locLabel)
+        self.horizontalLayout_3.addWidget(self.locTextBox)
+        self.horizontalLayout_3.addItem(spacerItem4)
+        self.horizontalLayout_3.addWidget(self.line)
+        self.horizontalLayout_3.addLayout(self.verticalLayout_5)
+
+        # Print Buttons
+        self.horizontalLayout_4 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_4.addItem(spacerItem5)
+        self.horizontalLayout_4.addWidget(self.printScipyButton)
+        self.horizontalLayout_4.addWidget(self.printDistButton)
         self.horizontalLayout_4.addItem(spacerItem6)
+
+        # Main Organizer of the GUI 
+        self.verticalLayout = QtWidgets.QVBoxLayout(self.main_widget)
+        self.verticalLayout.addLayout(self.horizontalLayout)
+        self.verticalLayout.addWidget(self.line_4)
+        self.verticalLayout.setContentsMargins(0, 0, 0, 0)
+        self.verticalLayout.addLayout(self.horizontalLayout_3)
+        self.verticalLayout.addWidget(self.line_3)
+        self.verticalLayout.addWidget(self.candDistsLabel)
+        self.verticalLayout.addWidget(self.candListsTableWidget)
+        self.verticalLayout.addWidget(self.line_5)
         self.verticalLayout.addLayout(self.horizontalLayout_4)
-        self.verticalLayoutWidget.raise_()
+
+        self.main_widget.raise_()
         self.candListsTableWidget.raise_()
 
         self.menubar = QtWidgets.QMenuBar(self)
@@ -234,32 +254,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setMenuBar(self.menubar)
 
         self.statusbar = QtWidgets.QStatusBar(self)
-        self.statusbar.setObjectName("statusbar")
         self.setStatusBar(self.statusbar)
         self.actionAbout = QtWidgets.QAction(self)
-        self.actionAbout.setObjectName("actionAbout")
         self.actionAbout.setText("About")
         self.menuAbout.addAction(self.actionAbout)
         self.menubar.addAction(self.menuAbout.menuAction())
-
-        
-        # --- Bind events with actions ---
-        self.dataFileButton.clicked.connect(self.upload_samples)    # Data File
-        self.quantileComboBox.activated.connect(self.update_query_method) # Quantile Method
-
-        self.availDistsListWidget.itemClicked.connect(self.unlock_location)
-
-
-        # Add Distributions
-        self.addButton.clicked.connect(self.add_dist_by_button)
-        self.availDistsListWidget.itemDoubleClicked.connect(self.add_dist_by_dclick)
-
-        # Remove Distributions
-        self.removeButton.clicked.connect(self.rm_distribution)
-        self.removeAllButton.clicked.connect(self.rm_all_distributions)
-
-        # Plot Probability Plot
-        self.candListsTableWidget.itemDoubleClicked.connect(self.create_probability_plot)
 
         QtCore.QMetaObject.connectSlotsByName(self)
 

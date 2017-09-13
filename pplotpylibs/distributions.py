@@ -126,6 +126,26 @@ class SupportedDistributions():
     def has_optional_loc_param(cls, dist_str):
         if dist_str not in cls.subclasses:
             raise ValueError("Invalid distribution: %s" %dist_str)
+        return cls.subclasses[dist_str](dist_str).loc_optional  
+
+    def feed_samples(self, samples):
+        self.samples = np.sort(samples)
+        self.nsamples = np.size(samples)
+
+    def get_label(self):
+        return self.label
+
+    def set_location(self, loc):
+        if self.has_loc:
+            self.loc = loc
+
+    def get_scale_str(self):
+        if self.has_scale:
+            return str(self.scale)
+        else:
+            return "NA"
+    
+    def get_loc_str(self):
         if self.has_loc:
             return str(self.loc)
         else:
