@@ -1,25 +1,27 @@
-"""
-    pplotpy - a probability plotting tool for Python
-
-    Copyright (C) 2017,  Nicholas A. Reynolds
-
-    License Summary:
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-    Full License Available in LICENSE file at
-    https://github.com/nicholasareynolds/pplotpy
-"""
+###############################################################################
+#
+#    pplotpy - a probability plotting tool for Python
+#
+#    Copyright (C) 2017,  Nicholas A. Reynolds
+#
+#    License Summary:
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+#    Full License Available in LICENSE file at
+#    https://github.com/nicholasareynolds/pplotpy
+#
+###############################################################################
 
 from scipy import stats
 from scipy.special import erfinv
@@ -28,35 +30,61 @@ from quantiles import Quantiles
 import numpy as np
 
 class CandidateDistributions:
+    """
+    Organize the candiate distribution objects for probability plotting.
+
+    The main attribute of CandidateDistributions is the list 'dists'.  User-
+    specified distributions for consideration are added to and removed from
+    this list.  This list also serves as an iterable item when data and/or
+    quantile calculation method are changed.
+    """
     
     def __init__(self):
+        """initialize the emtpy list for 'dists'"""
+
         self.dists = list()
+
         
     def add_distribution(self, dist_obj, samples, qmethod_str):
+        """Store samples to dist_obj, compute values, and append to 'dists' """
+
         self._calc_results(dist_obj, samples, qmethod_str)
         self.dists.append(dist_obj)
 
+
     def _calc_results(self, dist_obj, samples, qmethod_str):
+        """Store samples; calc. quantiles, perform regression for dist_obj."""
+
         dist_obj.feed_samples(samples)
         dist_obj.calc_quantiles(qmethod_str)
         dist_obj.eval_data()
 
+
     def calc_all(self, samples, qmethod_str):
+        """Perform prob. plot calcs for all distributions in self.dists."""
         for dist_obj in self.dists:
             self._calc_results(dist_obj, samples, qmethod_str)
 
 
     def get_count(self):
+        """Return the number of candidate distributions in self.dists"""
+
         return len(self.dists)
 
+
     def get_obj(self,index):
+        """Get distribution object using its index in the list."""
+
         return self.dists[index]
 
 
     def remove_all(self):
+        """Empty the list of candidate distributions."""
+
         self.dists = list()
         
     def remove_dist(self, dist_index):
+        
         self.dists.pop(dist_index)
 
     def store_data(self, samples):
@@ -91,26 +119,6 @@ class SupportedDistributions():
     def has_optional_loc_param(cls, dist_str):
         if dist_str not in cls.subclasses:
             raise ValueError("Invalid distribution: %s" %dist_str)
-        return cls.subclasses[dist_str](dist_str).loc_optional     
-
-    def feed_samples(self, samples):
-        self.samples = np.sort(samples)
-        self.nsamples = np.size(samples)
-
-    def get_label(self):
-        return self.label
-
-    def set_location(self, loc):
-        if self.has_loc:
-            self.loc = loc
-
-    def get_scale_str(self):
-        if self.has_scale:
-            return str(self.scale)
-        else:
-            return "NA"
-    
-    def get_loc_str(self):
         if self.has_loc:
             return str(self.loc)
         else:
@@ -345,3 +353,23 @@ class Uniform(SupportedDistributions):
         self.loc = None
 
         
+###############################################################################
+#
+#    pplotpy - a probability plotting tool for Python
+#
+#    Copyright (C) 2017,  Nicholas A. Reynolds
+#
+#    License Summary:
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
