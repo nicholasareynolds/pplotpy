@@ -33,6 +33,7 @@ from matplotlib.figure import Figure
 from distributions import SupportedDistributions, CandidateDistributions
 from quantiles import Quantiles
 
+
 class MainWindow(QtWidgets.QMainWindow):
     """Main window of pplotpy; no parent higher than this object"""
     
@@ -50,84 +51,84 @@ class MainWindow(QtWidgets.QMainWindow):
                               "Scale",
                               "Shape",
                               "R^2"]
-        
         self.initUI()
         
+
     def initUI(self):
         """Set up user interface"""
 
         # Main Window Area
         self.setWindowTitle("pplotpy")
         self.resize(566, 520)
-        self.main_widget = QtWidgets.QWidget(self)
-        self.main_widget.setGeometry(QtCore.QRect(10, 10, 541, 461))
+        self.windowWidget = QtWidgets.QWidget(self)
+        self.windowWidget.setGeometry(QtCore.QRect(10, 10, 541, 461))
 
         # --- Declare Widgets ---
 
         # Data Button (Open File Dialog)
-        self.dataFileButton = QtWidgets.QPushButton(self.main_widget)
+        self.dataFileButton = QtWidgets.QPushButton(self.windowWidget)
         self.dataFileButton.setText("Data File")
         # action
-        self.dataFileButton.clicked.connect(self.upload_samples)
+        self.dataFileButton.clicked.connect(self.loadSamples)
 
         # File Path (Path to Data Sample File)
-        self.dataFilePath = QtWidgets.QLineEdit(self.main_widget)
+        self.dataFilePath = QtWidgets.QLineEdit(self.windowWidget)
         self.dataFilePath.setEnabled(False)
 
 
         # Quantiles (Combo Box)
-        self.quantileLabel = QtWidgets.QLabel(self.main_widget)
+        self.quantileLabel = QtWidgets.QLabel(self.windowWidget)
         self.quantileLabel.setText("Quantile Method:")
-        self.quantileComboBox = QtWidgets.QComboBox(self.main_widget)
+        self.quantileComboBox = QtWidgets.QComboBox(self.windowWidget)
         self.quantileComboBox.addItems(self.quantile_choices)
         # action
-        self.quantileComboBox.activated.connect(self.update_query_method) 
+        self.quantileComboBox.activated.connect(self.updateQMethod) 
 
         # Available Distributions (List Box)
-        self.availDistsLabel = QtWidgets.QLabel(self.main_widget)
+        self.availDistsLabel = QtWidgets.QLabel(self.windowWidget)
         self.availDistsLabel.setText("Available Distributions:")
-        self.availDistsListWidget = QtWidgets.QListWidget(self.main_widget)
+        self.availDistsListWidget = QtWidgets.QListWidget(self.windowWidget)
         self.availDistsListWidget.setEnabled(False)
         self.availDistsListWidget.addItems(self.aDists)
         self.availDistsListWidget.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self.availDistsListWidget.setCurrentRow(0)
         # actions
-        self.availDistsListWidget.itemClicked.connect(self.unlock_location)
-        self.availDistsListWidget.itemDoubleClicked.connect(self.add_dist_by_dclick)
+        self.availDistsListWidget.itemClicked.connect(self.unlockLocTextBox)
+        self.availDistsListWidget.itemDoubleClicked.connect(self.addDistByDClick)
 
         # Location Parameter (optional user-specified)
-        self.locLabel = QtWidgets.QLabel(self.main_widget)
+        self.locLabel = QtWidgets.QLabel(self.windowWidget)
         self.locLabel.setEnabled(False)
         self.locLabel.setText("Location:")
-        self.locTextBox = QtWidgets.QLineEdit(self.main_widget)
+        self.locTextBox = QtWidgets.QLineEdit(self.windowWidget)
         self.locTextBox.setEnabled(False)
         self.locTextBox.setMaximumSize(QtCore.QSize(50, 16777215))
         self.locTextBox.setText("")
 
         # Remove All (Button)
-        self.removeAllButton = QtWidgets.QPushButton(self.main_widget)
+        self.removeAllButton = QtWidgets.QPushButton(self.windowWidget)
         self.removeAllButton.setText("Remove All")
         # action
-        self.removeAllButton.clicked.connect(self.rm_all_distributions)
+        self.removeAllButton.clicked.connect(self.rmAllDistributions)
 
         # Remove (Button)
-        self.removeButton = QtWidgets.QPushButton(self.main_widget)
+        self.removeButton = QtWidgets.QPushButton(self.windowWidget)
         self.removeButton.setText("Remove")
         self.removeButton.setDisabled(True)
         # action
-        self.removeButton.clicked.connect(self.rm_distribution)
+        self.removeButton.clicked.connect(self.rmDistribution)
 
         # Add (Button)
-        self.addButton = QtWidgets.QPushButton(self.main_widget)
+        self.addButton = QtWidgets.QPushButton(self.windowWidget)
         self.addButton.setText("Add")
         self.addButton.setDisabled(True)
         # action
-        self.addButton.clicked.connect(self.add_dist_by_button)
+        self.addButton.clicked.connect(self.addDistByButton)
 
         # Candidate Distributions (Table)
-        self.candDistsLabel = QtWidgets.QLabel(self.main_widget)
+        self.candDistsLabel = QtWidgets.QLabel(self.windowWidget)
         self.candDistsLabel.setText("Candidate Distributions:")
-        self.candListsTableWidget = QtWidgets.QTableWidget(self.main_widget)
+        self.candListsTableWidget = QtWidgets.QTableWidget(self.windowWidget)
         self.candListsTableWidget.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         self.candListsTableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self.candListsTableWidget.setColumnCount(5)
@@ -135,35 +136,35 @@ class MainWindow(QtWidgets.QMainWindow):
         self.candListsTableWidget.setHorizontalHeaderLabels(self.table_headers)
         self.candListsTableWidget.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
         # action
-        self.candListsTableWidget.itemDoubleClicked.connect(self.create_probability_plot)
+        self.candListsTableWidget.itemDoubleClicked.connect(self.makePPlot)
 
         # Print SciPy (button)
-        self.printScipyButton = QtWidgets.QPushButton(self.main_widget)
+        self.printScipyButton = QtWidgets.QPushButton(self.windowWidget)
         self.printScipyButton.setText("Print SciPy")
 
         # Print Distribution (button)
-        self.printDistButton = QtWidgets.QPushButton(self.main_widget)
+        self.printDistButton = QtWidgets.QPushButton(self.windowWidget)
         self.printDistButton.setText("Print Distribution")
 
         # Lines 
         #   (between Data File and Quantile Combo Box) 
-        self.line_2 = QtWidgets.QFrame(self.main_widget)
+        self.line_2 = QtWidgets.QFrame(self.windowWidget)
         self.line_2.setFrameShape(QtWidgets.QFrame.VLine)
         self.line_2.setFrameShadow(QtWidgets.QFrame.Sunken)
         #   (between 1st (file/quantile) & 2nd (supported distributions)
-        self.line_4 = QtWidgets.QFrame(self.main_widget)
+        self.line_4 = QtWidgets.QFrame(self.windowWidget)
         self.line_4.setFrameShape(QtWidgets.QFrame.HLine)
         self.line_4.setFrameShadow(QtWidgets.QFrame.Sunken)
 
-        self.line = QtWidgets.QFrame(self.main_widget)
+        self.line = QtWidgets.QFrame(self.windowWidget)
         self.line.setFrameShape(QtWidgets.QFrame.VLine)
         self.line.setFrameShadow(QtWidgets.QFrame.Sunken)
 
-        self.line_3 = QtWidgets.QFrame(self.main_widget)
+        self.line_3 = QtWidgets.QFrame(self.windowWidget)
         self.line_3.setFrameShape(QtWidgets.QFrame.HLine)
         self.line_3.setFrameShadow(QtWidgets.QFrame.Sunken)
 
-        self.line_5 = QtWidgets.QFrame(self.main_widget)
+        self.line_5 = QtWidgets.QFrame(self.windowWidget)
         self.line_5.setFrameShape(QtWidgets.QFrame.HLine)
         self.line_5.setFrameShadow(QtWidgets.QFrame.Sunken)
 
@@ -231,7 +232,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.horizontalLayout_4.addItem(spacerItem6)
 
         # Main Organizer of the GUI 
-        self.verticalLayout = QtWidgets.QVBoxLayout(self.main_widget)
+        self.verticalLayout = QtWidgets.QVBoxLayout(self.windowWidget)
         self.verticalLayout.addLayout(self.horizontalLayout)
         self.verticalLayout.addWidget(self.line_4)
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
@@ -242,7 +243,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.verticalLayout.addWidget(self.line_5)
         self.verticalLayout.addLayout(self.horizontalLayout_4)
 
-        self.main_widget.raise_()
+        self.windowWidget.raise_()
         self.candListsTableWidget.raise_()
 
         self.menubar = QtWidgets.QMenuBar(self)
@@ -265,18 +266,20 @@ class MainWindow(QtWidgets.QMainWindow):
         # Display GUI
         self.show()
 
-    # Wrapper Defintion for updating all distributions
-    def update_existing(function):
+    # Wrapper Defintion for updating/re-calculating all distributions
+    def updateExisting(function):
         def wrapper(self, *args):
             function(self, *args)
             if self.cDists.get_count() > 0 and self.samples != None:
                 self.candListsTableWidget.clearContents()
                 self.cDists.calc_all(self.samples, self.qmethod)
-                self.update_results()
+                self.updateResults()
         return wrapper      
 
-    @update_existing
-    def upload_samples(self, *args):
+    @updateExisting
+    def loadSamples(self, *args):
+        """Read samples from file, add error message to status bar if error"""
+
         fpath = QtWidgets.QFileDialog.getOpenFileName(None, 
                                                       "Select data file")[0]
         try:
@@ -293,7 +296,10 @@ class MainWindow(QtWidgets.QMainWindow):
             self.addButton.setDisabled(True)
             self.dataFilePath.setText("")
 
-    def unlock_location(self, item):
+
+    def unlockLocTextBox(self, item):
+        """Enable location text field if permitted for highlighted distribution"""
+
         dist_name = item.text()
         if SupportedDistributions.has_optional_loc_param(dist_name) == True:
             self.locTextBox.setEnabled(True)
@@ -303,17 +309,26 @@ class MainWindow(QtWidgets.QMainWindow):
             self.locTextBox.setDisabled(True)
             self.locLabel.setDisabled(True)
             self.locTextBox.setText("")
-    
-    @update_existing
-    def update_query_method(self, index):
+   
+ 
+    @updateExisting
+    def updateQMethod(self, index):
+        """Store the string assoc. with the quantile method selected in combo box"""
+
         self.qmethod =self.quantileComboBox.currentText()
+
         
-    def update_results(self):
+    def updateResults(self):
+        """Recalculate values from prob. plot and update the candidates table"""
+
         self.cDists.calc_all(self.samples, self.qmethod)
         for ii, dist in enumerate(self.cDists.dists):
-            self.update_row(ii, dist)
+            self.updateRow(ii, dist)
+
         
-    def update_row(self, row_index, dist_obj):
+    def updateRow(self, row_index, dist_obj):
+        """Query values from distr. object, and update cand. distr. table"""
+
         self.candListsTableWidget.setItem(row_index,
                                           0,
                                           QtWidgets.QTableWidgetItem(dist_obj.get_label()))
@@ -331,37 +346,54 @@ class MainWindow(QtWidgets.QMainWindow):
                                           QtWidgets.QTableWidgetItem(dist_obj.get_coeff_of_determ_str()))
 
 
-    def add_row(self):
+    def addRow(self):
+        """Add a blank row to the candidate distributions table."""
+
         row_index = self.candListsTableWidget.rowCount()
         self.candListsTableWidget.insertRow(row_index)
         return row_index
 
-    def add_distribution(self, dist_name):
+
+    def addDistByButton(self):
+        """Instantiate obj. from highlighted item; add to cand. distr. table."""
+ 
+        dist_name = self.availDistsListWidget.currentItem().text()
+        self.addDistribution(dist_name) 
+
+
+     def addDistByDClick(self, item):
+        """Instantiate obj. from double-clicked item; calc vals, & add to table"""
+
+        dist_name = item.text()
+        self.addDistribution(dist_name)        
+
+
+    def addDistribution(self, dist_name):
+        """Instantiate a dist. obj. by label; calc. values, and add to table."""
+
         dist_obj = SupportedDistributions.create_subclass_instance(dist_name)
         if dist_obj.loc_optional == True:
             loc_val = float(self.locTextBox.text())
             dist_obj.set_location(loc_val)
-        self.cDists.add_distribution(dist_obj, self.samples, self.qmethod)
+        self.cDists.addDistribution(dist_obj, self.samples, self.qmethod)
         
-        row_index = self.add_row()
-        self.update_row(row_index, self.cDists.get_obj(-1))
+        row_index = self.addRow()
+        self.updateRow(row_index, self.cDists.get_obj(-1))
         self.removeButton.setEnabled(True)
         
-    def add_dist_by_dclick(self, item):
-        dist_name = item.text()
-        self.add_distribution(dist_name)        
 
-    def create_probability_plot(self, item):
+    def makePPlot(self, item):
+        """Open a new window with prob. plot of double-clicked cand. distr."""
+
         row = item.row()
         dist_obj = self.cDists.get_obj(row)
         dist_name = dist_obj.get_label()
         PlotWindow(self,dist_obj, dist_name)
-        
-    def add_dist_by_button(self):
-        dist_name = self.availDistsListWidget.currentItem().text()
-        self.add_distribution(dist_name) 
-        
-    def rm_distribution(self):
+
+
+    def rmDistribution(self):
+        """ Remove the selected distribution from the cand. distr. table."""
+
         try:
             row = self.candListsTableWidget.currentRow()
             self.cDists.remove_dist(row)
@@ -371,30 +403,37 @@ class MainWindow(QtWidgets.QMainWindow):
         except:
             self.statusbar.showMessage("Select a cand. distri. to remove")
 
-    def rm_all_distributions(self):
+
+    def rmAllDistributions(self):
+        """Clear all candidate distributions (empty table)"""
+
         self.candListsTableWidget.clearContents()
         self.candListsTableWidget.setRowCount(0)
         self.cDists.remove_all()
 
+
 class PlotWindow(QtWidgets.QMainWindow):
+    """PlotWindow is a child window that hosts the probability plot canvas"""
     
     def __init__(self, parent, dist_obj, dist_name):
         super().__init__(parent=parent)
         self.canvas = PlotCanvas(self)
         self.canvas.plot(dist_obj)
-        self.main_widget = QtWidgets.QWidget(self)
+        self.plotWindowWidget = QtWidgets.QWidget(self)
         self.setWindowTitle(dist_name)
         self.initUI()
 
+
     def initUI(self):
-        l = QtWidgets.QVBoxLayout(self.main_widget)
+        l = QtWidgets.QVBoxLayout(self.plotWindowWidget)
         l.addWidget(self.canvas)
-        self.main_widget.setFocus()
-        self.setCentralWidget(self.main_widget)
+        self.windowWidget.setFocus()
+        self.setCentralWidget(self.plotWindowWidget)
         self.show()
     
 
 class PlotCanvas(FigureCanvas):
+    """Surfaces/axes onto which prob. plot is made, embedded in matplotlib window"""
  
     def __init__(self,
                  parent=None,
@@ -413,9 +452,10 @@ class PlotCanvas(FigureCanvas):
         FigureCanvas.updateGeometry(self)
   
     def plot(self, dist_obj):
-        #self.axes.plot([1,3,4],[5,3,2])
+        # Pass axes from canvas to the distr. obj. for plotting
         dist_obj.create_pplot(self.axes)
         self.draw()
+
 
 if __name__ == "__main__":
     import sys
