@@ -361,7 +361,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.addDistribution(dist_name) 
 
 
-     def addDistByDClick(self, item):
+    def addDistByDClick(self, item):
         """Instantiate obj. from double-clicked item; calc vals, & add to table"""
 
         dist_name = item.text()
@@ -375,7 +375,7 @@ class MainWindow(QtWidgets.QMainWindow):
         if dist_obj.loc_optional == True:
             loc_val = float(self.locTextBox.text())
             dist_obj.set_location(loc_val)
-        self.cDists.addDistribution(dist_obj, self.samples, self.qmethod)
+        self.cDists.add_distribution(dist_obj, self.samples, self.qmethod)
         
         row_index = self.addRow()
         self.updateRow(row_index, self.cDists.get_obj(-1))
@@ -427,7 +427,7 @@ class PlotWindow(QtWidgets.QMainWindow):
     def initUI(self):
         l = QtWidgets.QVBoxLayout(self.plotWindowWidget)
         l.addWidget(self.canvas)
-        self.windowWidget.setFocus()
+        self.plotWindowWidget.setFocus()
         self.setCentralWidget(self.plotWindowWidget)
         self.show()
     
