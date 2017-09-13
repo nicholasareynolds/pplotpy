@@ -243,6 +243,14 @@ class SupportedDistributions():
         self.quantiles = \
             Quantiles.create_subclass_instance(qmethod)().get_quantiles(n)
 
+    def get_scipy_command(self):
+        """Return the SciPy command to instantiate distr. object using results of pplotpy"""
+       
+        text = "dist_obj = scipy.stats.%s(" % self.scipy_name
+        if self.has_shape == True:
+            text += self.get_shape_str() + ','
+        text +=  "loc=%s, scale=%s)" % (self.get_loc_str(), self.get_scale_str())
+        return text
 
 @SupportedDistributions.register_distribution("Normal")    
 class Normal(SupportedDistributions):
