@@ -280,10 +280,12 @@ class MainWindow(QtWidgets.QMainWindow):
     def loadSamples(self, *args):
         """Read samples from file, add error message to status bar if error"""
 
-        fpath = QtWidgets.QFileDialog.getOpenFileName(None, 
-                                                      "Select data file")[0]
+        fpath = QtWidgets.QFileDialog.getOpenFileName(self,
+                                                      "Select data file",
+                                                      '',
+                                                      "Comma-Separated Values (*.csv)")[0]
         try:
-            raw_data = loadtxt(fpath)
+            raw_data = loadtxt(fpath, delimiter=",")
             self.samples = raw_data.flatten()
             self.statusbar.clearMessage()
             self.availDistsListWidget.setEnabled(True)
@@ -417,29 +419,74 @@ class PlotWindow(QtWidgets.QMainWindow):
     
     def __init__(self, parent, dist_obj, dist_name):
         super().__init__(parent=parent)
+        self.dist_obj = dist_obj
         self.canvas = PlotCanvas(self)
         self.canvas.plot(dist_obj)
-        self.plotWindowWidget = QtWidgets.QWidget(self)
+        self.windowWidget = QtWidgets.QWidget(self)
         self.setWindowTitle(dist_name)
         self.initUI()
 
 
     def initUI(self):
-        l = QtWidgets.QVBoxLayout(self.plotWindowWidget)
-        l.addWidget(self.canvas)
-        self.plotWindowWidget.setFocus()
-        self.setCentralWidget(self.plotWindowWidget)
+
+        # --- Declare Items to go in window ---
+        
+        # Save Button (Save File Dialog)
+        saveButton = QtWidgets.QPushButton(self.windowWidget)
+        saveButton.setText("Save Plot")
+        # action
+        saveButton.clicked.connect(self.savePlot)
+
+        # Spaces
+        spacerItem1  = QtWidgets.QSpacerItem(40, 20,
+                                             QtWidgets.QSizePolicy.Expanding,
+                                             QtWidgets.QSizePolicy.Minimum)
+        spacerItem2  = QtWidgets.QSpacerItem(40, 20,
+                                             QtWidgets.QSizePolicy.Expanding,
+                                             QtWidgets.QSizePolicy.Minimum)
+
+        # Layout boxes
+        horizontalLayout = QtWidgets.QHBoxLayout()
+        verticalLayout = QtWidgets.QVBoxLayout(self.windowWidget)
+
+        # --- Assemble ---
+        horizontalLayout.addItem(spacerItem1)
+        horizontalLayout.addWidget(saveButton)
+        horizontalLayout.addItem(spacerItem2)
+        
+        verticalLayout.addWidget(self.canvas)
+        verticalLayout.addLayout(horizontalLayout)
+        self.windowWidget.setFocus()
+        self.setCentralWidget(self.windowWidget)
         self.show()
+
+    def savePlot(self, *args):
+        """Save a *.png of the present plot"""
+
+        fpath = QtWidgets.QFileDialog.getSaveFileName(self.windowWidget,
+                                                      "Specify destination",
+                                                      '',
+                                                      "Portable Networks Graphic (*.png)")[0]
+        if fpath:
+            try:
+                import matplotlib.pyplot as plt
+                axes = plt.axes()
+                self.dist_obj.create_pplot(axes)
+                plt.savefig(fpath, dpi=600)
+                plt.close()
+            except:
+                pass
     
+
 
 class PlotCanvas(FigureCanvas):
     """Surfaces/axes onto which prob. plot is made, embedded in matplotlib window"""
  
     def __init__(self,
                  parent=None,
-                 width=5,
+                 width=6,
                  height=4,
-                 dpi=100,):
+                 dpi=150,):
         fig = Figure(figsize=(width, height), dpi=dpi)
         self.axes = fig.add_subplot(111)
  
