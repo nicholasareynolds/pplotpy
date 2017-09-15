@@ -142,10 +142,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.printScipyButton = QtWidgets.QPushButton(self.windowWidget)
         self.printScipyButton.setText("Print SciPy")
 
-        # Print Distribution (button)
-        self.printDistButton = QtWidgets.QPushButton(self.windowWidget)
-        self.printDistButton.setText("Print Distribution")
-
         # Lines 
         #   (between Data File and Quantile Combo Box) 
         self.line_2 = QtWidgets.QFrame(self.windowWidget)
@@ -228,7 +224,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.horizontalLayout_4 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_4.addItem(spacerItem5)
         self.horizontalLayout_4.addWidget(self.printScipyButton)
-        self.horizontalLayout_4.addWidget(self.printDistButton)
         self.horizontalLayout_4.addItem(spacerItem6)
 
         # Main Organizer of the GUI 
