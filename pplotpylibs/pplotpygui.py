@@ -415,28 +415,25 @@ class MainWindow(QtWidgets.QMainWindow):
         self.cDists.remove_all()
 
     def showAbout(self):
-        text = """
-        pplotpy v0.0.1
+        text = \
+"""pplotpy v0.0.1
         
-        Copyright (c) 2017 Nicholas A. Reynolds
+Copyright (c) 2017 Nicholas A. Reynolds
         
-        Licensed under the GNU General Public License v3.0
+Licensed under the GNU General Public License v3.0
         
-        For bugs and feature requests, or license information,
-        please go to the GitHub repository:
-        https://github.com/nicholasareynolds/pplotpy
+To report bugs, request features, or see license information, please go to the
+GitHub repository:  https://github.com/nicholasareynolds/pplotpy
         
-        This project uses probability plotting both (1) to help scientists and
-        engineers identify the underlying distribution for his or her set of
-        random samples, and (2) to predict the values of the parameters in
-        that distribution.  More detail can be found in the references cited
-        in the source code.
+This project uses probability plotting both (1) to help scientists and
+engineers identify the underlying distribution for his or her set of random
+samples, and (2) to predict the values of the parameters in that distribution.
+More detail can be found in the references cited in the source code.
         
-        This project was tested using Python v3.6, and the following libraries:
-            - NumPy v1.11.3
-            - matplotlib v2.0.2
-            - pyqt5 v5.6.0
-        """
+This project was tested using Python v3.6, and the following libraries:
+    - NumPy v1.11.3
+    - matplotlib v2.0.2
+    - pyqt5 v5.6.0"""
         QtWidgets.QMessageBox.about(self,  "About pplotpy", text)
 
 
