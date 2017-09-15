@@ -66,28 +66,28 @@ class MainWindow(QtWidgets.QMainWindow):
         # --- Declare Widgets ---
 
         # Data Button (Open File Dialog)
-        self.dataFileButton = QtWidgets.QPushButton(self.windowWidget)
+        self.dataFileButton = QtWidgets.QPushButton()
         self.dataFileButton.setText("Data File")
         # action
         self.dataFileButton.clicked.connect(self.loadSamples)
 
         # File Path (Path to Data Sample File)
-        self.dataFilePath = QtWidgets.QLineEdit(self.windowWidget)
+        self.dataFilePath = QtWidgets.QLineEdit()
         self.dataFilePath.setEnabled(False)
 
 
         # Quantiles (Combo Box)
-        self.quantileLabel = QtWidgets.QLabel(self.windowWidget)
+        self.quantileLabel = QtWidgets.QLabel()
         self.quantileLabel.setText("Quantile Method:")
-        self.quantileComboBox = QtWidgets.QComboBox(self.windowWidget)
+        self.quantileComboBox = QtWidgets.QComboBox()
         self.quantileComboBox.addItems(self.quantile_choices)
         # action
         self.quantileComboBox.activated.connect(self.updateQMethod) 
 
         # Available Distributions (List Box)
-        self.availDistsLabel = QtWidgets.QLabel(self.windowWidget)
+        self.availDistsLabel = QtWidgets.QLabel()
         self.availDistsLabel.setText("Available Distributions:")
-        self.availDistsListWidget = QtWidgets.QListWidget(self.windowWidget)
+        self.availDistsListWidget = QtWidgets.QListWidget()
         self.availDistsListWidget.setEnabled(False)
         self.availDistsListWidget.addItems(self.aDists)
         self.availDistsListWidget.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
@@ -97,38 +97,38 @@ class MainWindow(QtWidgets.QMainWindow):
         self.availDistsListWidget.itemDoubleClicked.connect(self.addDistByDClick)
 
         # Location Parameter (optional user-specified)
-        self.locLabel = QtWidgets.QLabel(self.windowWidget)
+        self.locLabel = QtWidgets.QLabel()
         self.locLabel.setEnabled(False)
         self.locLabel.setText("Location:")
-        self.locTextBox = QtWidgets.QLineEdit(self.windowWidget)
+        self.locTextBox = QtWidgets.QLineEdit()
         self.locTextBox.setEnabled(False)
         self.locTextBox.setMaximumSize(QtCore.QSize(50, 16777215))
         self.locTextBox.setText("")
 
         # Remove All (Button)
-        self.removeAllButton = QtWidgets.QPushButton(self.windowWidget)
+        self.removeAllButton = QtWidgets.QPushButton()
         self.removeAllButton.setText("Remove All")
         # action
         self.removeAllButton.clicked.connect(self.rmAllDistributions)
 
         # Remove (Button)
-        self.removeButton = QtWidgets.QPushButton(self.windowWidget)
+        self.removeButton = QtWidgets.QPushButton()
         self.removeButton.setText("Remove")
         self.removeButton.setDisabled(True)
         # action
         self.removeButton.clicked.connect(self.rmDistribution)
 
         # Add (Button)
-        self.addButton = QtWidgets.QPushButton(self.windowWidget)
+        self.addButton = QtWidgets.QPushButton()
         self.addButton.setText("Add")
         self.addButton.setDisabled(True)
         # action
         self.addButton.clicked.connect(self.addDistByButton)
 
         # Candidate Distributions (Table)
-        self.candDistsLabel = QtWidgets.QLabel(self.windowWidget)
+        self.candDistsLabel = QtWidgets.QLabel()
         self.candDistsLabel.setText("Candidate Distributions:")
-        self.candListsTableWidget = QtWidgets.QTableWidget(self.windowWidget)
+        self.candListsTableWidget = QtWidgets.QTableWidget()
         self.candListsTableWidget.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         self.candListsTableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self.candListsTableWidget.setColumnCount(5)
@@ -137,30 +137,34 @@ class MainWindow(QtWidgets.QMainWindow):
         self.candListsTableWidget.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
         # action
         self.candListsTableWidget.itemDoubleClicked.connect(self.makePPlot)
+        self.candListsTableWidget.itemClicked.connect(self.enablePrintScipy)
+        
 
         # Print SciPy (button)
-        self.printScipyButton = QtWidgets.QPushButton(self.windowWidget)
+        self.printScipyButton = QtWidgets.QPushButton()
         self.printScipyButton.setText("Print SciPy")
+        self.printScipyButton.setDisabled(True)
+        self.printScipyButton.clicked.connect(self.showScipyDef)
 
         # Lines 
         #   (between Data File and Quantile Combo Box) 
-        self.line_2 = QtWidgets.QFrame(self.windowWidget)
+        self.line_2 = QtWidgets.QFrame()
         self.line_2.setFrameShape(QtWidgets.QFrame.VLine)
         self.line_2.setFrameShadow(QtWidgets.QFrame.Sunken)
         #   (between 1st (file/quantile) & 2nd (supported distributions)
-        self.line_4 = QtWidgets.QFrame(self.windowWidget)
+        self.line_4 = QtWidgets.QFrame()
         self.line_4.setFrameShape(QtWidgets.QFrame.HLine)
         self.line_4.setFrameShadow(QtWidgets.QFrame.Sunken)
 
-        self.line = QtWidgets.QFrame(self.windowWidget)
+        self.line = QtWidgets.QFrame()
         self.line.setFrameShape(QtWidgets.QFrame.VLine)
         self.line.setFrameShadow(QtWidgets.QFrame.Sunken)
 
-        self.line_3 = QtWidgets.QFrame(self.windowWidget)
+        self.line_3 = QtWidgets.QFrame()
         self.line_3.setFrameShape(QtWidgets.QFrame.HLine)
         self.line_3.setFrameShadow(QtWidgets.QFrame.Sunken)
 
-        self.line_5 = QtWidgets.QFrame(self.windowWidget)
+        self.line_5 = QtWidgets.QFrame()
         self.line_5.setFrameShape(QtWidgets.QFrame.HLine)
         self.line_5.setFrameShadow(QtWidgets.QFrame.Sunken)
 
@@ -397,6 +401,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.candListsTableWidget.removeRow(row)
             if self.candListsTableWidget.rowCount() == 0:
                 self.removeButton.setDisabled(True)
+                self.printScipyButton.setDisabled(True)
         except:
             self.statusbar.showMessage("Select a cand. distri. to remove")
 
@@ -406,6 +411,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.candListsTableWidget.clearContents()
         self.candListsTableWidget.setRowCount(0)
+        self.printScipyButton.setDisabled(True)
         self.cDists.remove_all()
 
     def showAbout(self):
@@ -434,6 +440,26 @@ class MainWindow(QtWidgets.QMainWindow):
         QtWidgets.QMessageBox.about(self,  "About pplotpy", text)
 
 
+    def enablePrintScipy(self):
+        "Enable 'Print SciPy'; activated once a candidate distribution is selected"
+        
+        self.printScipyButton.setEnabled(True)
+
+
+    def showScipyDef(self):
+        "Display syntax for declaring a RV using param values found with pplotpy"
+        
+        row = self.candListsTableWidget.currentRow()
+        dist_obj = self.cDists.get_obj(row)
+        text = """
+import scipy.stats
+        
+%s""" % dist_obj.get_scipy_command()
+        QtWidgets.QMessageBox.about(self,
+                                    "SciPy Definition: " + dist_obj.get_label(),
+                                    text)
+
+
 class PlotWindow(QtWidgets.QMainWindow):
     """PlotWindow is a child window that hosts the probability plot canvas"""
     
@@ -452,7 +478,7 @@ class PlotWindow(QtWidgets.QMainWindow):
         # --- Declare Items to go in window ---
         
         # Save Button (Save File Dialog)
-        saveButton = QtWidgets.QPushButton(self.windowWidget)
+        saveButton = QtWidgets.QPushButton()
         saveButton.setText("Save Plot")
         # action
         saveButton.clicked.connect(self.savePlot)
@@ -465,17 +491,16 @@ class PlotWindow(QtWidgets.QMainWindow):
                                              QtWidgets.QSizePolicy.Expanding,
                                              QtWidgets.QSizePolicy.Minimum)
 
-        # Layout boxes
-        horizontalLayout = QtWidgets.QHBoxLayout()
-        verticalLayout = QtWidgets.QVBoxLayout(self.windowWidget)
-
         # --- Assemble ---
+        horizontalLayout = QtWidgets.QHBoxLayout()
         horizontalLayout.addItem(spacerItem1)
         horizontalLayout.addWidget(saveButton)
         horizontalLayout.addItem(spacerItem2)
         
+        verticalLayout = QtWidgets.QVBoxLayout(self.windowWidget)
         verticalLayout.addWidget(self.canvas)
         verticalLayout.addLayout(horizontalLayout)
+
         self.windowWidget.setFocus()
         self.setCentralWidget(self.windowWidget)
         self.show()

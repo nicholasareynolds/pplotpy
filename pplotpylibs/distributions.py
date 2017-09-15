@@ -246,10 +246,14 @@ class SupportedDistributions():
     def get_scipy_command(self):
         """Return the SciPy command to instantiate distr. object using results of pplotpy"""
        
-        text = "dist_obj = scipy.stats.%s(" % self.scipy_name
+        text = "myRV = scipy.stats.%s(" % self.scipy_name
+        indent = ' ' * len(text)
         if self.has_shape == True:
-            text += self.get_shape_str() + ','
-        text +=  "loc=%s, scale=%s)" % (self.get_loc_str(), self.get_scale_str())
+            text += self.get_shape_str() + ',\n'
+            text += indent + "loc=%s,\n" % self.get_loc_str()
+        else:
+            text += "loc=%s,\n" % self.get_loc_str()
+        text += indent + "scale=%s)" % self.get_scale_str()
         return text
 
 @SupportedDistributions.register_distribution("Normal")    
