@@ -243,16 +243,16 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.menubar = QtWidgets.QMenuBar(self)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 566, 19))
-        self.menubar.setObjectName("menubar")
         self.menuAbout = QtWidgets.QMenu(self.menubar)
         self.menuAbout.setTitle("Help")
-        self.menuAbout.setObjectName("menuAbout")
         self.setMenuBar(self.menubar)
 
         self.statusbar = QtWidgets.QStatusBar(self)
         self.setStatusBar(self.statusbar)
+        
         self.actionAbout = QtWidgets.QAction(self)
         self.actionAbout.setText("About")
+        self.actionAbout.triggered.connect(self.showAbout)
         self.menuAbout.addAction(self.actionAbout)
         self.menubar.addAction(self.menuAbout.menuAction())
 
@@ -408,6 +408,31 @@ class MainWindow(QtWidgets.QMainWindow):
         self.candListsTableWidget.setRowCount(0)
         self.cDists.remove_all()
 
+    def showAbout(self):
+        text = """
+        pplotpy v0.0.1
+        
+        Copyright (c) 2017 Nicholas A. Reynolds
+        
+        Licensed under the GNU General Public License v3.0
+        
+        For bugs and feature requests, or license information,
+        please go to the GitHub repository:
+        https://github.com/nicholasareynolds/pplotpy
+        
+        This project uses probability plotting both (1) to help scientists and
+        engineers identify the underlying distribution for his or her set of
+        random samples, and (2) to predict the values of the parameters in
+        that distribution.  More detail can be found in the references cited
+        in the source code.
+        
+        This project was tested using Python v3.6, and the following libraries:
+            - NumPy v1.11.3
+            - matplotlib v2.0.2
+            - pyqt5 v5.6.0
+        """
+        QtWidgets.QMessageBox.about(self,  "About pplotpy", text)
+
 
 class PlotWindow(QtWidgets.QMainWindow):
     """PlotWindow is a child window that hosts the probability plot canvas"""
@@ -498,6 +523,7 @@ class PlotCanvas(FigureCanvas):
         dist_obj.create_pplot(self.axes)
         self.draw()
 
+        
 
 if __name__ == "__main__":
     import sys
