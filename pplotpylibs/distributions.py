@@ -295,8 +295,8 @@ class Lognormal(SupportedDistributions):
     has_loc = True  # can be specified, default 0
     has_scale = True
     loc_optional = True
-    xlabel = r"$erf^{-1}\left[F_X(x)\right]$"
-    ylabel = r"$\ln(x)$"
+    xlabel = r"$erf^{-1}\left[F_X(x-loc)\right]$"
+    ylabel = r"$\ln(x-loc)$"
     
 
     def _pplot_transform_data(self):
@@ -328,8 +328,8 @@ class Exponential(SupportedDistributions):
     has_loc = True # can be specified, default 0
     has_shape = False
     loc_optional = True
-    xlabel = r"$x$"
-    ylabel = r"$\ln\left(\frac{1}{1-F_X(x)}\right)$"
+    xlabel = r"$x-loc$"
+    ylabel = r"$\ln\left(\frac{1}{1-F_X(x-loc)}\right)$"
  
 
     def _pplot_transform_data(self):
@@ -361,8 +361,8 @@ class Weibull(SupportedDistributions):
     has_shape = True 
     has_loc = True # can be specified, default = 0
     loc_optional = True
-    xlabel = r"$\ln(x)$"
-    ylabel = r"$\ln\left[\ln\left(\frac{1}{1-F_X(x)}\right)\right]$"
+    xlabel = r"$\ln(x-loc)$"
+    ylabel = r"$\ln\left[\ln\left(\frac{1}{1-F_X(x-loc)}\right)\right]$"
         
     def _pplot_transform_data(self):
         """Transf. samples/quantiles based on prob. plotting of Weibull distr."""
@@ -448,8 +448,8 @@ class Uniform(SupportedDistributions):
 
 #   Information on probability plotting with Uniform distribution:
 #   [a] NIST  - http://www.itl.nist.gov/div898/handbook/eda/section3/eda3662.htm
-#   [c] Wolfram Mathworld - http://mathworld.wolfram.com/UniformDistribution.html
-#   [d] SciPy - https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.uniform.html
+#   [b] Wolfram Mathworld - http://mathworld.wolfram.com/UniformDistribution.html
+#   [c] SciPy - https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.uniform.html
  
     scipy_name = "uniform"
     has_shape = False
@@ -479,8 +479,8 @@ class Cauchy(SupportedDistributions):
 
 #   Information on probability plotting with Uniform distribution:
 #   [a] NIST  - http://www.itl.nist.gov/div898/handbook/eda/section3/eda3663.htm
-#   [c] Wolfram Mathworld - http://mathworld.wolfram.com/UniformDistribution.html
-#   [d] SciPy -https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.cauchy.html
+#   [b] Wolfram Mathworld - http://mathworld.wolfram.com/CauchyDistribution.html
+#   [c] SciPy -https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.cauchy.html
  
     scipy_name = "cauchy"
     has_shape = False
@@ -495,6 +495,36 @@ class Cauchy(SupportedDistributions):
         """Transf. samples/quantiles based on prob. plotting of Cauchy distr."""
 
         self.x = np.tan(np.pi * (self.quantiles - 0.5))
+        self.y = self.samples
+
+
+    def extract_pplot_regress_quantities(self):      
+        """Calculate scale and locations values from prob. plot slope/intercept."""
+
+        self.scale = self.slope
+        self.loc = self.intercept        
+
+@SupportedDistributions.register_distribution("Rayleigh")
+class Rayleigh(SupportedDistributions):
+    """Rayleigh probability plotting object"""
+
+#   Information on probability plotting with Uniform distribution:
+#   [a] Wolfram Mathworld - http://mathworld.wolfram.com/RayleighDistribution.html
+#   [b] SciPy - https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.rayleigh.html
+ 
+    scipy_name = "rayleigh"
+    has_shape = False
+    has_loc = True
+    has_scale = True
+    loc_optional = True
+    xlabel = r"$\sqrt{-2 \ln\left(F_X{x-loc}\right)}$"
+    ylabel = r"$x-loc$"
+
+
+    def _pplot_transform_data(self):
+        """Transf. samples/quantiles based on prob. plotting of Rayleigh distr."""
+
+        self.x = np.sqrt(-2.0 * np.log(1.0 - self.quantiles) )
         self.y = self.samples
 
 
