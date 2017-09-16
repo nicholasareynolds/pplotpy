@@ -36,12 +36,16 @@ This program comes with ABSOLUTELY NO WARRANTY; this is free software, and you
 are welcome to redistribute it under certain conditions.  For more information,
 see the license file at the GitHub repository:
     
-https://github.com/nicholasareynolds/pplotpy/blob/master/LICENSE"""
+https://github.com/nicholasareynolds/pplotpy/
+
+"""
 
 description = \
 """pplotpy probability plotting both (1) to help scientists and
 engineers identify the underlying distribution for his or her set of random
-samples, and (2) to predict the values of the parameters in that distribution."""
+samples, and (2) to predict the values of the parameters in that distribution.
+
+"""
 
 parser = ArgumentParser(description=description,
                         epilog=epilog,
@@ -78,13 +82,13 @@ parser.add_argument('--loc',
                     action='store',
                     type=float,
                     default=0.0,
-                    help='specify value of the location parameter; only valid for some distribution')
+                    help='specify value of the location parameter; only valid for some distributions')
 
 parser.add_argument('--plot',
                     dest='plotBool',
                     action='store_true',
                     default=False,
-                    help='display show the probability plot')
+                    help='show the probability plot')
 
 
 if __name__ == "__main__":

@@ -484,4 +484,35 @@ class Uniform(SupportedDistributions):
         self.scale = self.slope
         self.loc = self.intercept        
 
+@SupportedDistributions.register_distribution("Cauchy")
+class Cauchy(SupportedDistributions):
+    """Cauchy probability plotting object"""
+
+#   Information on probability plotting with Uniform distribution:
+#   [a] NIST  - http://www.itl.nist.gov/div898/handbook/eda/section3/eda3663.htm
+#   [c] Wolfram Mathworld - http://mathworld.wolfram.com/UniformDistribution.html
+#   [d] SciPy -https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.cauchy.html
+ 
+    scipy_name = "cauchy"
+    has_shape = False
+    has_loc = True
+    has_scale = True
+    loc_optional = False
+    xlabel = r"$tan\left(\pi(F_X{x}-0.5)\right)$"
+    ylabel = r"$x$"
+
+
+    def _pplot_transform_data(self):
+        """Transf. samples/quantiles based on prob. plotting of Cauchy distr."""
+
+        self.x = np.tan(np.pi * (self.quantiles - 0.5))
+        self.y = self.samples
+
+
+    def extract_pplot_regress_quantities(self):      
+        """Calculate scale and locations values from prob. plot slope/intercept."""
+
+        self.scale = self.slope
+        self.loc = self.intercept        
+
 
