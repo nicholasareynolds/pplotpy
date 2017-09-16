@@ -25,7 +25,7 @@
 
 from scipy import stats
 from scipy.special import erfinv
-from quantiles import Quantiles
+from . import quantiles
 
 import numpy as np
 
@@ -179,14 +179,16 @@ class SupportedDistributions():
             return "NA"
 
 
-    def calc_results(self, samples, qmethod_str):
-        """Calculate the distr. parameters based on samples and quantile method."""
-
-        self.feed_samples(samples)
-        self.calc_quantiles(qmethod_str)
-        self.set_location(loc)
-        self.eval_data()
-
+#==============================================================================
+#     def calc_results(self, samples, qmethod_str):
+#         """Calculate the distr. parameters based on samples and quantile method."""
+# 
+#         self.feed_samples(samples)
+#         self.calc_quantiles(qmethod_str)
+#         self.set_location(loc)
+#         self.eval_data()
+# 
+#==============================================================================
         
     def get_coeff_of_determ_str(self):
         """Return the coefficient of determination of prob. plot as a string."""
@@ -241,7 +243,7 @@ class SupportedDistributions():
 
         n = self.nsamples
         self.quantiles = \
-            Quantiles.create_subclass_instance(qmethod)().get_quantiles(n)
+            quantiles.Quantiles.create_subclass_instance(qmethod)().get_quantiles(n)
 
     def get_scipy_command(self):
         """Return the SciPy command to instantiate distr. object using results of pplotpy"""

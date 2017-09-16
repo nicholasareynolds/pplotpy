@@ -30,8 +30,8 @@ matplotlib.rcParams['backend'] = "Qt5Agg"
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 
-from distributions import SupportedDistributions, CandidateDistributions
-from quantiles import Quantiles
+from . import distributions
+from . import quantiles
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -42,9 +42,9 @@ class MainWindow(QtWidgets.QMainWindow):
         
         # Initialize
         self.samples = None
-        self.cDists = CandidateDistributions()
-        self.aDists = SupportedDistributions.subclasses.keys()
-        self.quantile_choices = Quantiles.subclasses.keys()
+        self.cDists = distributions.CandidateDistributions()
+        self.aDists = distributions.SupportedDistributions.subclasses.keys()
+        self.quantile_choices = quantiles.Quantiles.subclasses.keys()
         self.qmethod = list(self.quantile_choices)[0]
         self.table_headers = ["Distribution",
                               "Location",
@@ -302,7 +302,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """Enable location text field if permitted for highlighted distribution"""
 
         dist_name = item.text()
-        if SupportedDistributions.has_optional_loc_param(dist_name) == True:
+        if distributions.SupportedDistributions.has_optional_loc_param(dist_name) == True:
             self.locTextBox.setEnabled(True)
             self.locLabel.setEnabled(True)
             self.locTextBox.setText("0.0")
@@ -372,7 +372,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def addDistribution(self, dist_name):
         """Instantiate a dist. obj. by label; calc. values, and add to table."""
 
-        dist_obj = SupportedDistributions.create_subclass_instance(dist_name)
+        dist_obj = distributions.SupportedDistributions.create_subclass_instance(dist_name)
         if dist_obj.loc_optional == True:
             loc_val = float(self.locTextBox.text())
             dist_obj.set_location(loc_val)
