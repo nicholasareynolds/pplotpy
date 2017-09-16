@@ -178,17 +178,6 @@ class SupportedDistributions():
         else:
             return "NA"
 
-
-#==============================================================================
-#     def calc_results(self, samples, qmethod_str):
-#         """Calculate the distr. parameters based on samples and quantile method."""
-# 
-#         self.feed_samples(samples)
-#         self.calc_quantiles(qmethod_str)
-#         self.set_location(loc)
-#         self.eval_data()
-# 
-#==============================================================================
         
     def get_coeff_of_determ_str(self):
         """Return the coefficient of determination of prob. plot as a string."""
