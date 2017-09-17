@@ -4,20 +4,6 @@
 #
 #    Copyright (C) 2017,  Nicholas A. Reynolds
 #
-#    License Summary:
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version.
-#
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
-#
-#    You should have received a copy of the GNU General Public License
-#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
 #    Full License Available in LICENSE file at
 #    https://github.com/nicholasareynolds/pplotpy
 #
@@ -113,20 +99,6 @@ class SupportedDistributions():
     def register_distribution(cls, dist_str):
         def decorator(subclass):
             cls.subclasses[dist_str] = subclass
-            return subclass
-        return decorator
-    
-
-    # Decorator to instantiate a distribution object from its label.
-    @classmethod
-    def create_subclass_instance(cls, dist_str):
-        if dist_str not in cls.subclasses:
-            raise ValueError("Invalid distribution: %s" %dist_str)
-        return cls.subclasses[dist_str](dist_str)
-
-
-    # Decorator to return the value of the location parameter, if it exists
-    @classmethod
     def has_optional_loc_param(cls, dist_str):
         if dist_str not in cls.subclasses:
             raise ValueError("Invalid distribution: %s" %dist_str)
@@ -247,46 +219,19 @@ class SupportedDistributions():
         text += indent + "scale=%s)" % self.get_scale_str()
         return text
 
-
-    def _calc_pdf_cdf(self, num_points=1000):
-        """Populate a pdf-cdf data from scipy object."""
-
-        # Note: do not include 1st or last points, which may correspond to 
-        # +/- infinite
-        self.cdf_vals = np.linspace(1.0/num_points,
-                                    (num_points-1)/num_points,
-                                    num_points-2)
-        self.scipy_vals = self.scipy_obj.ppf(self.cdf_vals)
-        self.pdf_vals = self.scipy_obj.pdf(self.scipy_vals)
-
-
-    def plot_pdfcdf(self, axes, samples=True):
-        """Draw pdf and cdfs of resulting scipy distribution object"""
-        
-        self._create_scipy_obj()
-        self._calc_pdf_cdf()
-        
-        # PDF Plot
-        axes.plot(self.scipy_vals,
-                  self.pdf_vals,
-                  '-b',
-                  label="PDF")
-        axes.set_xlabel("Parameter Values")
-        axes.set_ylabel("PDF Value")
-        axes.set_title(self.label)
-        axes.legend(loc=2)
-        
-        ax2 = axes.twinx()
-        ax2.plot(self.scipy_vals,
-                 self.cdf_vals,
-                 '-r',
-                 label="CDF")
-        ax2.set_ylabel("CDF Value")
-        ax2.plot(self.samples,
-                 self.quantiles,
-                 'ro')
-        ax2.legend(loc=1)
-
+@SupportedDistributions.register_distribution("Normal")    
+    def get_scipy_command(self):
+        """Return the SciPy command to instantiate distr. object using results of pplotpy"""
+       
+        text = "myRV = scipy.stats.%s(" % self.scipy_name
+        indent = ' ' * len(text)
+        if self.has_shape == True:
+            text += self.get_shape_str() + ',\n'
+            text += indent + "loc=%s,\n" % self.get_loc_str()
+        else:
+            text += "loc=%s,\n" % self.get_loc_str()
+        text += indent + "scale=%s)" % self.get_scale_str()
+        return text
 
 @SupportedDistributions.register_distribution("Normal")    
 class Normal(SupportedDistributions):
@@ -319,12 +264,6 @@ class Normal(SupportedDistributions):
 
         self.scale = self.slope   # stdev
         self.loc = self.intercept # mean
-        
-    def _create_scipy_obj(self):
-        """Instantiate a frozen scipy object for the normal distribution"""        
-
-        from scipy.stats import norm
-        self.scipy_obj = norm(loc=self.loc, scale=self.scale)
     
     
 @SupportedDistributions.register_distribution("Lognormal")    
@@ -359,11 +298,6 @@ class Lognormal(SupportedDistributions):
         self.shape = self.slope * np.log(10)
         self.scale = self.intercept # mean
 
-    def _create_scipy_obj(self):
-        """Instantiate a frozen scipy object for the lognormal distribution"""
-        
-        from scipy.stats import lognorm
-        self.scipy_obj = lognorm(self.shape, loc=self.loc, scale=self.scale)
 
 @SupportedDistributions.register_distribution("Exponential") 
 class Exponential(SupportedDistributions):
@@ -396,12 +330,6 @@ class Exponential(SupportedDistributions):
 
         self.scale = 1.0 / self.slope
         
-        
-    def _create_scipy_obj(self):
-        """Instantiate a frozen scipy object for the exponential distribution""" 
-        
-        from scipy.stats import expon
-        self.scipy_obj = expon(loc=self.loc, scale=self.scale)
 
         
 @SupportedDistributions.register_distribution("Weibull") 
@@ -434,12 +362,6 @@ class Weibull(SupportedDistributions):
 
         self.shape = self.slope
         self.scale = np.exp(-1.0 * self.intercept/ self.slope)
-
-    def _create_scipy_obj(self):
-        """Instantiate a frozen scipy object for the weibull distribution"""        
-        
-        from scipy.stats import frechet_r
-        self.scipy_obj = frechet_r(self.shape, loc=self.loc, scale=self.scale)
 
         
 @SupportedDistributions.register_distribution("Extreme Value, Type I")
@@ -474,14 +396,6 @@ class ExtremeValueTypeI(SupportedDistributions):
         self.loc = 1.0 * self.intercept * self.slope
 
 
-    def _create_scipy_obj(self):
-        """Instantiate a frozen scipy object for the EV-I distribution"""        
-
-        from scipy.stats import gumbel_l
-        self.scipy_obj = gumbel_l(loc=self.loc, scale=self.scale)
-
-
-
 @SupportedDistributions.register_distribution("Logistic")
 class Logistic(SupportedDistributions):
     """Logistic probability plotting object"""
@@ -513,13 +427,6 @@ class Logistic(SupportedDistributions):
         self.scale = 0.5 * self.slope
         self.loc = self.intercept
 
-
-    def _create_scipy_obj(self):
-        """Instantiate a frozen scipy object for the logistic distribution"""
-        
-        from scipy.stats import logistic
-        self.scipy_obj = logistic(loc=self.loc, scale=self.scale)
-        
         
 @SupportedDistributions.register_distribution("Uniform")
 class Uniform(SupportedDistributions):
@@ -552,12 +459,6 @@ class Uniform(SupportedDistributions):
         self.scale = self.slope
         self.loc = self.intercept        
 
-
-    def _create_scipy_obj(self):
-        """Instantiate a frozen scipy object for the uniform distribution"""
-        from scipy.stats import uniform
-        self.scipy_obj = uniform(loc=self.loc, scale=self.scale)
-
 @SupportedDistributions.register_distribution("Cauchy")
 class Cauchy(SupportedDistributions):
     """Cauchy probability plotting object"""
@@ -589,13 +490,6 @@ class Cauchy(SupportedDistributions):
         self.scale = self.slope
         self.loc = self.intercept        
 
-
-    def _create_scipy_obj(self):
-        """Instantiate a frozen scipy object for the cauchy distribution"""
-        
-        from scipy.stats import cauchy
-        self.scipy_obj = cauchy(loc=self.loc, scale=self.scale)
-
 @SupportedDistributions.register_distribution("Rayleigh")
 class Rayleigh(SupportedDistributions):
     """Rayleigh probability plotting object"""
@@ -614,7 +508,7 @@ class Rayleigh(SupportedDistributions):
 
 
     def _pplot_transform_data(self):
-        """Transf. samples/quantiles based on prob. plotting of Rayleigh distr."""
+        """Transf. samples/quantiles based on prob. plotting of Cauchy distr."""
 
         self.x = np.sqrt(-2.0 * np.log(1.0 - self.quantiles) )
         self.y = self.samples
@@ -627,8 +521,3 @@ class Rayleigh(SupportedDistributions):
         self.loc = self.intercept        
 
 
-    def _create_scipy_obj(self):
-        """Instantiate a frozen scipy object for the rayleigh distribution"""
-        
-        from scipy.stats import rayleigh
-        self.scipy_obj = rayleigh(loc=self.loc, scale=self.scale)

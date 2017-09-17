@@ -1,8 +1,28 @@
-pplotpy - a probability plotting tool for Python
-
-pplotpy is licensed under the GNU GPL v3 license.  Please see the LICENSE file at https://github.com/nicholasareynolds/pplotpy .
+# pplotpy
 
 Probability PLOT PYthon is a package that will help a user in identifying the probabilistic distribution to which a set of data belongs.  pplotpy accepts a user-supplied set of samples, calculates the associated quantiles through order statistic operations, and estimates the values of distribution parameters for user-specified distributions. pplotpy is available both as a GUI and through a command line interface.
+
+## Getting Started
+
+In order to use pplotpy, the Python 3 interpreter is needed.  This can be installed directly from python.org, or more conveniently, as part of a bundled package (e.g. Enthought Canopy, Anaconda, etc...)  Furthermore, several supporting libraries are required, which are given in the following subsection:
+
+### Prerequisities
+
+- SciPy
+
+- NumPy
+
+- matplotlib
+
+- PyQT5
+
+### Installation
+
+
+
+## License
+pplotpy is licensed under the MIT license.  Please see the LICENSE file at https://github.com/nicholasareynolds/pplotpy .
+
 
 Probability plotting is a powerful method for quantifying goodness-of-fit with several advantages over other goodness-of-fit tests.  Unlike with the Chi-Square goodness-of-fit test, probability plotting does not require that the samples be grouped into bins.  Unlike with Kolmogerov-Smirnov goodness-of-fit test, wherein the values of a candidate distribution's parameter must be known a priori, the samples can be used to estimate the values of those parameters in probability plotting.  Lastly, unlike with Anderson-Darling goodness-of-fit test, probability plotting does not depend on pre-tabulated values specific to each distribution and significance level.  
 
