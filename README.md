@@ -23,6 +23,10 @@ Supported Distributions:
 
 - Uniform
 
+- Cauchy
+
+- Rayleigh
+
 Written in:
 - Python 3.6
 
@@ -33,3 +37,5 @@ Required libraries:
 - numpy
 
 - matplotlib
+
+- scipy
