@@ -99,20 +99,6 @@ class SupportedDistributions():
     def register_distribution(cls, dist_str):
         def decorator(subclass):
             cls.subclasses[dist_str] = subclass
-    def has_optional_loc_param(cls, dist_str):
-        if dist_str not in cls.subclasses:
-            raise ValueError("Invalid distribution: %s" %dist_str)
-        return cls.subclasses[dist_str](dist_str).loc_optional  
-
-
-    def feed_samples(self, samples):
-        """Store samples and num. of samples in the object as attributes."""
-
-        self.samples = np.sort(samples)
-        self.nsamples = np.size(samples)
-
-
-    def get_label(self):
         """Get the label associated with this distribution"""
 
         return self.label
@@ -206,6 +192,20 @@ class SupportedDistributions():
         self.quantiles = \
             quantiles.Quantiles.create_subclass_instance(qmethod)().get_quantiles(n)
 
+    def get_scipy_command(self):
+        """Return the SciPy command to instantiate distr. object using results of pplotpy"""
+       
+        text = "myRV = scipy.stats.%s(" % self.scipy_name
+        indent = ' ' * len(text)
+        if self.has_shape == True:
+            text += self.get_shape_str() + ',\n'
+            text += indent + "loc=%s,\n" % self.get_loc_str()
+        else:
+            text += "loc=%s,\n" % self.get_loc_str()
+        text += indent + "scale=%s)" % self.get_scale_str()
+        return text
+
+@SupportedDistributions.register_distribution("Normal")    
     def get_scipy_command(self):
         """Return the SciPy command to instantiate distr. object using results of pplotpy"""
        
