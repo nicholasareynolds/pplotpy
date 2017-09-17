@@ -24,8 +24,8 @@
 
 import sys
 from argparse import ArgumentParser, RawTextHelpFormatter
-from pplotpylibs.quantiles import Quantiles 
-from pplotpylibs.distributions import SupportedDistributions 
+from pplotpy.quantiles import Quantiles 
+from pplotpy.distributions import SupportedDistributions 
 
 
 epilog = \
@@ -157,7 +157,7 @@ if __name__ == "__main__":
     # GUI Option
     else:
         from PyQt5 import QtWidgets
-        from pplotpylibs.pplotpygui import MainWindow
+        from pplotpygui import MainWindow
         app = QtWidgets.QApplication(sys.argv)
         ui = MainWindow()
         sys.exit(app.exec_())
