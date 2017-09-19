@@ -35,7 +35,7 @@ Add the destination directory path (destpath) to the PYTHONPATH:
 For Unix Systems:
 
 ```
-export PYTHON=$PYTHONPATH:despath
+export PYTHON=$PYTHONPATH:destpath
 ```
 
 ### Usage
