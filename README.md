@@ -1,4 +1,5 @@
-# *pplotpy*
+#
+*pplotpy*
 
 Probability PLOT PYthon is a tool that will help a user in identifying the probabilistic distribution to which a set of data belongs.  *pplotpy* accepts a user-supplied set of samples, calculates the associated quantiles through order statistic operations, and estimates the values of distribution parameters for user-specified distributions. *pplotpy* is available both as a GUI and through a command line interface.
 
@@ -29,20 +30,26 @@ In order to use *pplotpy*, the Python 3 interpreter is needed.  This can be inst
 
 From the [*pplotpy* GitHub repository](https://github.com/nicholasareynolds/*pplotpy*/) either Clone or download the repository.
 
-Either add the destination directory to the PYTHONPATH or add a symbolic link to it.
+Add the destination directory path (destpath) to the PYTHONPATH:
+
+For Unix Systems:
+
+```
+export PYTHON=$PYTHONPATH:despath
+```
 
 ### Usage
 
 From the command line, enter the command
 
 ```
-python *pplotpy*.py [OPTIONS]
+python pplotpy.py [OPTIONS]
 ```
 
 Where, OPTIONS is a list of command line options.  A complete list can be found by entering the command
 
 ```
-python *pplotpy*.py -h
+python pplotpy.py -h
 ```
 
 NOTE: The command line is used to launch both the command-line interace and the graphical user interface of *pplotpy*.
@@ -88,7 +95,7 @@ Quantiles are computed from the samples based on a number of available options. 
 
 ### License
 
-*pplotpy* is licensed under the MIT License - see the [LICENSE.md](https://github.com/nicholasareynolds/*pplotpy*/LICENSE.md).
+*pplotpy* is licensed under the MIT License - see the [LICENSE file](https://github.com/nicholasareynolds/*pplotpy*/LICENSE.md).
 
 ### Citing/acknowledgement
 
@@ -97,14 +104,6 @@ As a courtesy, please acknowledge *pplotpy* in papers, reports, or publications,
 ### Contributions
 
 *pplotpy* is by no means a completed project, or limited to contributions by the author.  If you wish to collaborate (or even suggest changes) please contact me ([nicholas.a.reynolds@gmail.com](mailto:nicholas.a.reynolds@gmail.com)).  Currently, there is a general plan to continue to add distributions to the distributions.py file.  
-
-## Why was this project started?
-
-(Sudden narrative change to first person)-
-
-I first learned about probability plotting while I was in grad school taking a course in structural reliability.  The professor noted that probability plotting was an acceptable way to demonstrate that a parameter belonged to a particular distribution, whereas comparing histogram data to a probability density function was "the quickest way to have a paper rejected from a structural reliability journal". 
-
-As I entered the workforce, I discovered that probability plotting was not well-known.  The existing probability plotting feature in SciPy was limited to.
 
 ## Acknowledgements
 *pplotpy* has not implemented any new scientific concepts; it has merely a methomethodology, that I learned in grad school and is openly available, in what I consider to be a convenient workflow to scientists/engineers who are not regularly involved in uncertainty quantification.
